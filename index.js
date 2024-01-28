@@ -1,7 +1,9 @@
 import jikoMember from "./jikoMembers.js";
 const nextButton = document.querySelector(".btn-next");
 const answerContainer = document.querySelector(".answers");
+const scoreElement = document.querySelector(".score");
 const currentScore = document.querySelector("#current-score");
+const questionContainer = document.querySelector(".jiko-question");
 
 document.querySelector("button").addEventListener("click", handleButtonClick);
 
@@ -31,6 +33,8 @@ function startQuiz() {
   questionIndex = 0;
   score = 0;
   currentScore.innerHTML = score;
+  scoreElement.style.display = "block";
+  nextButton.innerHTML = "Next";
   showQuestionsAnwers();
 }
 
@@ -40,7 +44,6 @@ function showQuestionsAnwers() {
 }
 
 function createElementQuestions() {
-  const questionContainer = document.querySelector(".jiko-question");
   const currentQuestion = jikoMember[questionIndex];
   questionContainer.innerHTML = `<p>${currentQuestion.question}</p>`;
 }
@@ -88,14 +91,31 @@ function resetState() {
   }
 }
 
-nextButton.addEventListener("click", handleNextBtn);
+function showResult() {
+  resetState();
+  questionContainer.innerHTML = `Your scored ${score} out of ${jikoMember.length}`;
+  questionContainer.style.fontSize = "24px";
+  scoreElement.style.display = "none";
+  nextButton.innerText = "Play again";
+  nextButton.style.color = "white";
+  nextButton.style.backgroundColor = "black";
+}
 
 function handleNextBtn() {
   questionIndex++;
   if (questionIndex < jikoMember.length) {
     showQuestionsAnwers();
   } else {
-    startQuiz();
+    showResult();
   }
 }
+
+nextButton.addEventListener("click", () => {
+  if (questionIndex < jikoMember.length) {
+    handleNextBtn();
+  } else {
+    startQuiz();
+  }
+});
+
 startQuiz();
