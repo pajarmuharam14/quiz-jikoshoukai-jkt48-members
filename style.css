@@ -19,6 +19,7 @@ main {
 .title h1 {
   color: #cd0c0d;
   text-transform: capitalize;
+  text-align: center;
 }
 
 .btn-start-quiz {
