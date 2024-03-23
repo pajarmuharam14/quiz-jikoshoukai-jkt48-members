@@ -38,43 +38,62 @@ function startQuiz() {
   showQuestionsAnwers();
 }
 
+function shuffleListQuestion(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 function showQuestionsAnwers() {
-  createElementQuestions();
-  createElementAnswers();
+  shuffleListQuestion(jikoMember);
+  createElementQuestionsAnswers();
 }
 
-function createElementQuestions() {
-  const currentQuestion = jikoMember[questionIndex];
-  questionContainer.innerHTML = `<p>${currentQuestion.question}</p>`;
-}
+function createElementQuestionsAnswers() {
+  if (jikoMember.length === 0) {
+    shuffleListQuestion(jikoMember);
+  }
 
-function createElementAnswers() {
+  const questionsAnswers = jikoMember.pop();
+  questionContainer.innerHTML = `<p>${questionsAnswers.question}</p>`;
+
   resetState();
-  const currentAnswer = jikoMember[questionIndex];
-  currentAnswer.answers.forEach((item) => {
-    const answerElements = document.createElement("button");
-    answerElements.classList.add("answer");
-    answerElements.innerText = item.answer;
+
+  questionsAnswers.answers.forEach((item) => {
+    const answerElements = createAnswerELements(item);
     answerContainer.appendChild(answerElements);
 
     nextButton.disabled = true;
 
     answerElements.addEventListener("click", () => {
-      if (item.correct == true) {
-        answerElements.classList.add("correct");
-        updateScore();
-      } else {
-        answerElements.classList.add("incorrect");
-      }
-      Array.from(answerContainer.children).forEach((answer) => {
-        answer.disabled = true;
-      });
-
-      nextButton.disabled = false;
-      nextButton.style.color = "white";
-      nextButton.style.backgroundColor = "black";
+      handleClickAnswer(item, answerElements);
     });
   });
+}
+
+function createAnswerELements(item) {
+  const answerBtns = document.createElement("button");
+  answerBtns.classList.add("answer");
+  answerBtns.innerText = item.answer;
+  return answerBtns;
+}
+
+function handleClickAnswer(item, el) {
+  if (item.correct == true) {
+    el.classList.add("correct");
+    updateScore();
+  } else {
+    el.classList.add("incorrect");
+  }
+
+  Array.from(answerContainer.children).forEach((answer) => {
+    answer.disabled = true;
+  });
+
+  nextButton.disabled = false;
+  nextButton.style.color = "white";
+  nextButton.style.backgroundColor = "black";
 }
 
 function updateScore() {
@@ -93,7 +112,7 @@ function resetState() {
 
 function showResult() {
   resetState();
-  questionContainer.innerHTML = `Your scored ${score} out of ${jikoMember.length}`;
+  questionContainer.innerHTML = `Your scored ${score}`;
   questionContainer.style.fontSize = "24px";
   scoreElement.style.display = "none";
   nextButton.innerText = "Play again";
@@ -103,7 +122,7 @@ function showResult() {
 
 function handleNextBtn() {
   questionIndex++;
-  if (questionIndex < jikoMember.length) {
+  if (questionIndex < 10) {
     showQuestionsAnwers();
   } else {
     showResult();
@@ -111,7 +130,7 @@ function handleNextBtn() {
 }
 
 nextButton.addEventListener("click", () => {
-  if (questionIndex < jikoMember.length) {
+  if (questionIndex < 10) {
     handleNextBtn();
   } else {
     startQuiz();
